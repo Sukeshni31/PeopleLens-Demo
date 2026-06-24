@@ -1,10 +1,596 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta http-equiv="refresh" content="0; url=PeopleLens-Demo.html">
-<title>PeopleLens</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PeopleLens — Felix Human Capital Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --teal:#0f766e;--teal-l:#f0fdfa;--teal-d:#0d5e57;
+  --ink:#0f172a;--ink2:#334155;--muted:#64748b;--muted2:#94a3b8;
+  --bg:#f1f5f9;--surface:#fff;--border:#e2e8f0;--border2:#f1f5f9;
+  --green:#059669;--green-l:#ecfdf5;
+  --red:#dc2626;--red-l:#fef2f2;
+  --amber:#d97706;--amber-l:#fffbeb;
+  --blue:#2563eb;--blue-l:#eff6ff;
+  --purple:#7c3aed;--purple-l:#f5f3ff;
+  --sh:0 1px 3px rgba(15,23,42,.07),0 1px 2px rgba(15,23,42,.04);
+  --sh2:0 4px 16px rgba(15,23,42,.08),0 1px 4px rgba(15,23,42,.04);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+nav{background:#0f172a;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,.06)}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-logo{width:32px;height:32px;background:var(--teal);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;letter-spacing:-.5px}
+.nav-title{font-size:15px;font-weight:700;color:#fff;letter-spacing:-.2px}
+.nav-title span{color:#14b8a6}
+.nav-sub{font-size:9px;color:rgba(255,255,255,.3);letter-spacing:1.2px;text-transform:uppercase;margin-top:1px}
+.nav-tabs{display:flex;gap:2px}
+.tab{padding:5px 14px;border-radius:5px;font-size:12px;font-weight:500;color:rgba(255,255,255,.5);cursor:pointer;border:none;background:none;transition:all .15s;letter-spacing:.01em}
+.tab:hover{color:rgba(255,255,255,.8);background:rgba(255,255,255,.06)}
+.tab.active{color:#14b8a6;background:rgba(20,184,166,.12);font-weight:600}
+.nav-badge{font-size:9px;background:rgba(20,184,166,.15);color:#14b8a6;border:1px solid rgba(20,184,166,.3);padding:2px 8px;border-radius:10px;letter-spacing:.5px;text-transform:uppercase;font-weight:600}
+
+/* VIEWS */
+.view{display:none;padding:24px 28px;max-width:1380px;margin:0 auto;animation:fadeIn .2s ease}
+.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:var(--sh)}
+.card-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.card-sub{font-size:11px;color:var(--muted);margin-bottom:16px}
+
+/* KPI STRIP */
+.kpi-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;box-shadow:var(--sh)}
+.kpi-val{font-size:30px;font-weight:800;letter-spacing:-1px;line-height:1}
+.kpi-label{font-size:11px;font-weight:600;color:var(--ink2);margin-top:5px}
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* GRID LAYOUTS */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+
+/* RISK BANNER */
+.risk-banner{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 18px;margin-bottom:18px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:#dc2626}
+.risk-dot{width:8px;height:8px;background:#dc2626;border-radius:50%;flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* TAGS/BADGES */
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.3px}
+.badge-red{background:var(--red-l);color:var(--red)}
+.badge-amber{background:var(--amber-l);color:var(--amber)}
+.badge-green{background:var(--green-l);color:var(--green)}
+.badge-blue{background:var(--blue-l);color:var(--blue)}
+.badge-purple{background:var(--purple-l);color:var(--purple)}
+.badge-teal{background:var(--teal-l);color:var(--teal)}
+
+/* BENCH CARDS */
+.bench-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px}
+.bench-aging{font-size:12px;font-weight:800;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.bench-name{font-size:13px;font-weight:700;color:var(--ink)}
+.bench-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.bench-skills{font-size:11px;color:var(--ink2);margin-top:6px;line-height:1.5}
+.match-pill{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:3px 10px 3px 5px;margin:3px 4px 0 0;font-size:11px;cursor:pointer}
+.match-score{font-size:10px;font-weight:700;color:#fff;border-radius:8px;padding:1px 6px}
+
+/* PROFILE CARDS */
+.profile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:var(--sh);transition:box-shadow .15s}
+.profile-card:hover{box-shadow:var(--sh2)}
+.profile-avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff;flex-shrink:0}
+.rating-bar{height:4px;border-radius:2px;background:var(--border);margin-top:6px;overflow:hidden}
+.rating-fill{height:100%;border-radius:2px;background:var(--teal)}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{padding:8px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--ink2)}
+tr:hover td{background:#f8fafc}
+
+/* SEARCH */
+.search-box{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--ink);background:var(--surface);outline:none;transition:border-color .15s}
+.search-box:focus{border-color:var(--teal)}
+
+/* DONUT */
+.donut-wrap{display:flex;align-items:center;gap:20px}
+.legend-item{display:flex;align-items:center;gap:7px;margin-bottom:6px;font-size:11px;color:var(--ink2)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* ROLLOFF CARD */
+.rolloff-card{padding:10px 14px;background:var(--bg);border-radius:8px;border-left:3px solid var(--teal)}
+.rolloff-name{font-size:12px;font-weight:600;color:var(--ink)}
+.rolloff-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.rolloff-days{font-size:10px;font-weight:700;margin-top:4px}
+
+/* ATTRITION ROW */
+.attr-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg);border-radius:8px;margin-bottom:7px}
+.attr-name{font-size:12px;font-weight:600;color:var(--ink);flex:1}
+.attr-skill{font-size:10px;color:var(--muted);flex:2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.attr-lwd{font-size:10px;font-weight:700;white-space:nowrap}
+
+/* OPEN POS ROW */
+.pos-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg);border-radius:8px;margin-bottom:7px}
+.pos-title{font-size:12px;font-weight:600;color:var(--ink);flex:2}
+.pos-client{font-size:10px;color:var(--muted);flex:1}
+.pos-loc{font-size:10px;color:var(--muted);flex:1}
+
+/* SECTION HEADER */
+.sec-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px}
+.sec-title{font-size:19px;font-weight:800;color:var(--ink);letter-spacing:-.4px}
+.sec-sub{font-size:12px;color:var(--muted);margin-top:3px}
+</style>
 </head>
 <body>
-<script>window.location.href = 'PeopleLens-Demo.html';</script>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">FL</div>
+    <div>
+      <div class="nav-title">Felix <span>PeopleLens</span></div>
+      <div class="nav-sub">HR Intelligence · Demo</div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="tab active" onclick="show('dashboard',this)">Dashboard</button>
+    <button class="tab" onclick="show('bench',this)">Bench & Positions</button>
+    <button class="tab" onclick="show('profiles',this)">Profiles</button>
+    <button class="tab" onclick="show('attrition',this)">Attrition</button>
+    <button class="tab" onclick="show('rolloffs',this)">Rolloffs</button>
+  </div>
+  <div class="nav-badge">Felix Human Capital · Demo</div>
+</nav>
+
+<!-- DASHBOARD -->
+<div class="view active" id="v-dashboard">
+
+  <div class="sec-header" style="margin-bottom:16px">
+    <div>
+      <div class="sec-title">Workforce Intelligence</div>
+      <div class="sec-sub">Felix Human Capital · Demo Environment · 50 employees across 12 accounts</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);background:var(--surface);border:1px solid var(--border);padding:5px 14px;border-radius:20px">June 2026</div>
+  </div>
+
+  <div class="risk-banner">
+    <div class="risk-dot"></div>
+    2 resources on bench 90+ days — immediate action required: Rajan, Suresh (196d) · Venkat, Arun (63d)
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-val" style="color:var(--ink)">50</div><div class="kpi-label">Total Headcount</div><div class="kpi-sub">Across 12 accounts</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--amber)">18</div><div class="kpi-label">On Bench</div><div class="kpi-sub">36% of workforce</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--red)">19</div><div class="kpi-label">Open Positions</div><div class="kpi-sub">Across 8 clients</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--purple)">20</div><div class="kpi-label">Resignations</div><div class="kpi-sub">This quarter</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--teal)">3.7</div><div class="kpi-label">Avg Rating</div><div class="kpi-sub">Out of 5.0</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--green)">12</div><div class="kpi-label">High Performers</div><div class="kpi-sub">Rating ≥ 4.0</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--red)">2</div><div class="kpi-label">At Risk</div><div class="kpi-sub">Rating &lt; 3.0</div></div>
+  </div>
+
+  <div class="grid2">
+    <!-- Practice Area Chart -->
+    <div class="card">
+      <div class="card-title">Headcount by Practice</div>
+      <div class="card-sub">Workforce across technical practices</div>
+      <svg width="100%" viewBox="0 0 480 180" style="overflow:visible">
+        <g id="practice-bars"></g>
+      </svg>
+    </div>
+
+    <!-- Client Distribution -->
+    <div class="card">
+      <div class="card-title">Headcount by Client</div>
+      <div class="card-sub">Resource allocation across accounts</div>
+      <div class="donut-wrap">
+        <svg width="160" height="160" viewBox="0 0 160 160" id="donut-svg" style="flex-shrink:0"></svg>
+        <div id="donut-legend"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <!-- Rating Distribution -->
+    <div class="card">
+      <div class="card-title">Performance Rating Distribution</div>
+      <div class="card-sub">Appraisal ratings across 50 employees</div>
+      <svg width="100%" viewBox="0 0 480 160" style="overflow:visible" id="rating-chart"></svg>
+    </div>
+
+    <!-- Bench Aging -->
+    <div class="card">
+      <div class="card-title">Bench Aging Profile</div>
+      <div class="card-sub">Days idle — longer = higher cost and attrition risk</div>
+      <svg width="100%" viewBox="0 0 480 160" style="overflow:visible" id="aging-chart"></svg>
+    </div>
+  </div>
+
+</div>
+
+<!-- BENCH & POSITIONS -->
+<div class="view" id="v-bench">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">Bench & Open Positions</div>
+      <div class="sec-sub">18 bench resources · 19 open positions · skill-match scoring</div>
+    </div>
+    <input class="search-box" style="width:220px" placeholder="Filter by name or skill…" oninput="filterBench(this.value)">
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start">
+    <div id="bench-list"></div>
+    <div class="card" style="position:sticky;top:68px">
+      <div class="card-title">Coverage Finder</div>
+      <div class="card-sub">If we release someone, who covers?</div>
+      <input class="search-box" placeholder="Type a person's name…" oninput="coverageCheck(this.value)" id="coverage-input">
+      <div id="coverage-results" style="margin-top:10px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILES -->
+<div class="view" id="v-profiles">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">Employee Profiles</div>
+      <div class="sec-sub">50 employees · click any card to see full profile</div>
+    </div>
+    <input class="search-box" style="width:220px" placeholder="Search name, role, client…" oninput="filterProfiles(this.value)">
+  </div>
+  <div class="profile-grid" id="profile-grid"></div>
+</div>
+
+<!-- ATTRITION -->
+<div class="view" id="v-attrition">
+  <div class="sec-header">
+    <div><div class="sec-title">Attrition Pipeline</div><div class="sec-sub">20 confirmed departures this quarter · critical skill gaps flagged</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">Departures by Client</div>
+      <div class="card-sub">Which accounts are most affected</div>
+      <svg width="100%" viewBox="0 0 440 200" id="attr-chart" style="overflow:visible"></svg>
+    </div>
+    <div class="card">
+      <div class="card-title">Skill Categories Lost</div>
+      <div class="card-sub">Practice areas losing capability</div>
+      <svg width="100%" viewBox="0 0 440 200" id="skill-loss-chart" style="overflow:visible"></svg>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="margin-bottom:14px">All Departures</div>
+    <div id="attr-list"></div>
+  </div>
+</div>
+
+<!-- ROLLOFFS -->
+<div class="view" id="v-rolloffs">
+  <div class="sec-header">
+    <div><div class="sec-title">Upcoming Rolloffs</div><div class="sec-sub">Resources coming off engagements — plan ahead</div></div>
+  </div>
+  <div class="grid3" id="rolloff-grid"></div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────
+const EMPLOYEES = [
+  {name:"Sharma, Priya",role:"Senior QA Engineer",client:"FashionBrand",dept:"QA",rating:4.0,raise:12,status:"billed",skills:"Selenium Java SQL OMS POS eCommerce API Testing JIRA TestRail",color:"#0f766e"},
+  {name:"Rajan, Suresh",role:"Cloud Engineer",client:"Bench",dept:"Cloud",rating:3.0,raise:8,status:"bench",aging:196,skills:"Azure AWS GCP Kubernetes Terraform Prometheus DevOps ARM Templates",color:"#dc2626"},
+  {name:"Nair, Arjun",role:"Principal Engineer",client:"StyleCo",dept:"Dev",rating:4.5,raise:15,status:"billed",skills:"React Redux TypeScript JavaScript Node.js Docker Kubernetes GraphQL REST APIs",color:"#2563eb"},
+  {name:"Reddy, Kiran",role:"BI Lead",client:"BuildCorp",dept:"BI",rating:3.75,raise:10,status:"resigned",lwd:"2026-06-30",skills:"Tableau Power BI Oracle SSRS SQL Data Visualization ETL",color:"#7c3aed"},
+  {name:"Williams, Mark",role:"Senior Data Engineer",client:"RetailCorp",dept:"Data",rating:4.0,raise:12,status:"billed",skills:"Snowflake Tableau Fivetran ETL Python SQL dbt Data Pipelines",color:"#0f766e"},
+  {name:"Pillai, Deepa",role:"Integration Specialist",client:"Bench",dept:"Integration",rating:3.5,raise:9,status:"bench",aging:14,skills:"Dell Boomi IBM EDI B2B Sterling Integrator Java SQL Oracle REST SOAP",color:"#d97706"},
+  {name:"Menon, Rahul",role:"Java Developer",client:"FashionBrand",dept:"Dev",rating:2.75,raise:6,status:"pip",skills:"Java Spring Boot Hibernate JavaScript React Docker Kubernetes",color:"#dc2626"},
+  {name:"Iyer, Ananya",role:"WMS QA Lead",client:"SportsBrand",dept:"QA",rating:4.5,raise:14,status:"billed",skills:"MAWM Manhattan Active WM MAO OMS WMS Selenium SQL QA Lead",color:"#059669"},
+  {name:"Kapoor, Rajiv",role:"Delivery Manager",client:"FoodCo",dept:"Delivery",rating:4.0,raise:11,status:"billed",skills:"Delivery Management Scrum Agile JIRA Stakeholder Management PMP",color:"#0f766e"},
+  {name:"Thomas, Kavya",role:"OMS Functional Consultant",client:"Bench",dept:"OMS",rating:4.0,raise:12,status:"bench",aging:0,skills:"Manhattan Active Omni MAO OMS eCommerce Sterling OMS SQL Order Management",color:"#0891b2"},
+  {name:"Matthews, Greg",role:"Frontend Tech Lead",client:"Internal ERP",dept:"Dev",rating:3.75,raise:10,status:"billed",skills:"React Vue.js JavaScript TypeScript CSS REST APIs UI Development",color:"#7c3aed"},
+  {name:"Sharma, Pavan",role:"SRE Engineer",client:"Bench",dept:"Cloud",rating:3.5,raise:8,status:"bench",aging:45,skills:"SRE AWS Kubernetes DevOps Prometheus Grafana Cloud Infrastructure",color:"#d97706"},
+  {name:"Venkat, Arun",role:"AS400 Developer",client:"NovaTech",dept:"ERP",rating:3.0,raise:7,status:"resigned",lwd:"2026-06-03",skills:"AS400 RPG400 RPGLE SQLRPGLE iSeries IBM",color:"#64748b"},
+  {name:"Kumar, Vikram",role:"QA Engineer",client:"Bench",dept:"QA",rating:3.0,raise:7,status:"bench",aging:30,skills:"MS Dynamics 365 F&O CRM QA API Testing SQL",color:"#d97706"},
+  {name:"Krishnan, Divya",role:"WMS QA Engineer",client:"RetailMax",dept:"QA",rating:3.5,raise:9,status:"billed",skills:"Korber HighJump WMS QA MAWM SQL Manual Testing",color:"#0891b2"},
+  {name:"Rao, Sudhir",role:"BI Admin",client:"Bench",dept:"BI",rating:3.75,raise:10,status:"bench",aging:14,skills:"Tableau OBIEE Admin Power BI SQL Data Visualization Reporting",color:"#d97706"},
+  {name:"Hussain, Farid",role:"SAP QA Engineer",client:"Bench",dept:"QA",rating:3.5,raise:8,status:"bench",aging:14,skills:"SAP QA SAP MM SAP SD SAP CAR S4 HANA Performance Testing",color:"#d97706"},
+  {name:"Naidu, Ramesh",role:"Senior ETL Developer",client:"DataFlow",dept:"Data",rating:4.0,raise:11,status:"resigned",lwd:"2026-06-19",skills:"Informatica PowerCenter IICS ODI AWS SQL ETL Data Engineering",color:"#64748b"},
+  {name:"Krishnamurthy, Aditya",role:"Scrum Master",client:"FashionHub",dept:"Delivery",rating:4.0,raise:10,status:"resigned",lwd:"2026-06-22",skills:"Scrum CSM Agile Tableau Project Management SQL",color:"#64748b"},
+  {name:"Venkataraman, Karthik",role:"Azure DevOps Admin",client:"Bench",dept:"Cloud",rating:3.5,raise:8,status:"bench",aging:0,skills:"Azure DevOps SRE Kubernetes Cloud CI/CD Monitoring",color:"#d97706"},
+  {name:"Bhat, Suresh",role:"Power BI Developer",client:"Bench",dept:"BI",rating:3.0,raise:7,status:"bench",aging:0,skills:"Power BI DAX SQL Data Visualization Reporting BI",color:"#94a3b8"},
+  {name:"Prasad, Mohan",role:"Oracle SOA Admin",client:"StyleCo",dept:"Integration",rating:3.25,raise:7,status:"resigned",lwd:"2026-07-17",skills:"Oracle SOA Admin Weblogic Admin EDI Middleware Oracle DBA",color:"#64748b"},
+  {name:"Varma, Swapna",role:"Data Engineer",client:"Bench",dept:"Data",rating:3.5,raise:9,status:"bench",aging:14,skills:"DataStage Unix SQL Shell Script Autosys Hadoop ETL",color:"#d97706"},
+  {name:"Sheikh, Imran",role:"Big Data Admin",client:"StyleCo",dept:"Data",rating:3.75,raise:9,status:"resigned",lwd:"2026-07-24",skills:"Hadoop HDFS Spark Kafka Grafana AWS Ansible Kubernetes",color:"#64748b"},
+  {name:"Fatima, Zara",role:"OMS Developer",client:"Bench",dept:"Dev",rating:3.5,raise:9,status:"bench",aging:0,skills:"Java OMS Sterling OMS UAT eCommerce SQL",color:"#94a3b8"},
+  {name:"Patel, Shreya",role:"QA Engineer",client:"Bench",dept:"QA",rating:3.0,raise:7,status:"bench",aging:0,skills:"QA POS OMS eCommerce Testing Java SQL Selenium Postman",color:"#94a3b8"},
+  {name:"Ramaswamy, Arun",role:"OMS QA Lead",client:"StyleRetail",dept:"QA",rating:4.0,raise:11,status:"billed",skills:"OMS Sterling OMS MAO Active Omni eCommerce QA SQL Test Planning",color:"#0f766e"},
+  {name:"Nair, Sundeep",role:"OMS Developer",client:"SportsCo",dept:"Dev",rating:4.0,raise:11,status:"billed",skills:"Sterling OMS Java SQL eCommerce Order Management REST APIs",color:"#0f766e"},
+  {name:"Subramaniam, Meera",role:"OMS QA Engineer",client:"HomeGoods",dept:"QA",rating:3.5,raise:9,status:"billed",skills:"OMS MAO eCommerce QA Manhattan Active Omni SQL Manual Testing",color:"#0891b2"},
+  {name:"Krishnaswamy, Jai",role:"Data Quality Engineer",client:"BuildMaterials",dept:"Data",rating:3.75,raise:10,status:"billed",skills:"Informatica PowerCenter IDQ IDMC CDQ IICS ETL Data Quality",color:"#0f766e"},
+  {name:"Padmanabhan, Priya",role:"WMS QA Lead",client:"HomeGoods",dept:"QA",rating:4.0,raise:12,status:"billed",skills:"OMS MAO WMS WCS eCommerce Manhattan Testing QA Lead SQL",color:"#0f766e"},
+  {name:"Ravi, Srinivasan",role:"OMS Developer",client:"StyleRetail",dept:"Dev",rating:4.0,raise:11,status:"billed",skills:"Active Omni Sterling OMS DOM Manhattan Java eCommerce SQL",color:"#059669"},
+  {name:"Chandra, Vikram",role:"Dell Boomi Developer",client:"LuxBrands",dept:"Integration",rating:3.5,raise:8,status:"billed",skills:"Dell Boomi EDI Java SQL Oracle REST SOAP Integration",color:"#0891b2"},
+  {name:"Goyal, Priya",role:"CPQ QA Engineer",client:"Bench",dept:"QA",rating:3.5,raise:8,status:"bench",aging:0,skills:"Salesforce CPQ Infor CPQ eCommerce QA Sales Cloud Service Cloud",color:"#94a3b8"},
+  {name:"Lakshmi, Preethi",role:"WMS QA Engineer",client:"RetailMax",dept:"QA",rating:3.0,raise:7,status:"billed",skills:"WMS HighJump Korber QA MAWM Manual Testing",color:"#0891b2"},
+  {name:"Ahmed, Siddiqui",role:"CRM QA Engineer",client:"StyleCo",dept:"QA",rating:3.0,raise:7,status:"resigned",lwd:"2026-06-19",skills:"QA SQL CRM MS Dynamics 365 Functional Testing",color:"#64748b"},
+  {name:"Sundaram, Kavitha",role:"AS400 Developer",client:"NovaTech",dept:"ERP",rating:3.5,raise:8,status:"resigned",lwd:"2026-06-03",skills:"AS400 RPG400 RPGLE SQLRPGLE iSeries IBM EDI Inventory",color:"#64748b"},
+  {name:"Mohan, Satish",role:"AS400 Developer",client:"NovaTech",dept:"ERP",rating:3.0,raise:7,status:"resigned",lwd:"2026-06-19",skills:"AS400 RPG IV SQLRPGLE RPG400 iSeries IBM ERP",color:"#64748b"},
+  {name:"Chakrabarti, Sourav",role:"Cloud DevOps Engineer",client:"GlobalInsure",dept:"Cloud",rating:4.0,raise:11,status:"resigned",lwd:"2026-06-19",skills:"AWS Azure GCP Kubernetes EKS Jenkins GitHub Actions DevOps",color:"#64748b"},
+  {name:"Singh, Priya",role:"MAWM QA Lead",client:"FoodCo",dept:"QA",rating:4.0,raise:12,status:"resigned",lwd:"2026-06-02",skills:"MAWM Manhattan Active WM QA Lead Warehouse Testing SQL",color:"#64748b"},
+  {name:"Devi, Anitha",role:"Retail Support Engineer",client:"RetailChain",dept:"Support",rating:3.5,raise:8,status:"resigned",lwd:"2026-06-19",skills:"Aptos POS WMS Retail Support Sales Auditing",color:"#64748b"},
+  {name:"Krishnan, Naveen",role:"Cloud Infrastructure Engineer",client:"GlobalInsure",dept:"Cloud",rating:4.0,raise:12,status:"resigned",lwd:"2026-06-19",skills:"AWS Azure AKS Terraform Ansible Kubernetes Helm Kafka",color:"#64748b"},
+  {name:"Patil, Santosh",role:"QA Engineer",client:"StyleCo",dept:"QA",rating:3.0,raise:7,status:"resigned",lwd:"2026-06-19",skills:"QA POS Performance Testing SQL API Testing Python Selenium",color:"#64748b"},
+  {name:"Joshi, Yashwant",role:"Python Developer",client:"WineRetail",dept:"Dev",rating:3.5,raise:8,status:"resigned",lwd:"2026-05-22",skills:"Python Django Backend Development REST APIs SQL Web Development",color:"#64748b"},
+  {name:"Mehra, Priya",role:"Integration Developer",client:"OutdoorRetail",dept:"Integration",rating:3.5,raise:8,status:"billed",skills:"Dell Boomi Java JavaScript SQL Oracle REST SOAP EDI",color:"#0891b2"},
+  {name:"Venkat, Suresh",role:"DataStage Developer",client:"StyleCo",dept:"Data",rating:3.5,raise:8,status:"resigned",lwd:"2026-06-27",skills:"DataStage Unix SQL ETL Data Engineering",color:"#64748b"},
+  {name:"Iyer, Rajan",role:"QA Engineer",client:"FashionBrand",dept:"QA",rating:3.5,raise:8,status:"resigned",lwd:"2026-06-26",skills:"QA OMS WMS PKMS Manual Testing Defect Management SQL",color:"#64748b"},
+  {name:"Nair, Priya",role:"Automation QA Engineer",client:"FashionBrand",dept:"QA",rating:4.0,raise:12,status:"billed",skills:"Selenium Playwright BDD Cucumber OMS Automation QA JavaScript Java",color:"#059669"},
+  {name:"Rajagopal, Anand",role:"Java Lead",client:"HomeDecor",dept:"Dev",rating:4.0,raise:11,status:"billed",skills:"Java Spring Boot Microservices Docker Kubernetes REST APIs SQL",color:"#0f766e"},
+  {name:"Mehta, Deepak",role:"Data Architect",client:"RetailCorp",dept:"Data",rating:4.5,raise:14,status:"billed",skills:"Snowflake dbt Python SQL Data Modelling Cloud Architecture ETL",color:"#059669"},
+];
+
+const BENCH = EMPLOYEES.filter(e=>e.status==='bench').map(e=>({...e,aging:e.aging||0}));
+const RESIGNED = EMPLOYEES.filter(e=>e.status==='resigned');
+
+const OPEN_POS = [
+  {title:"MAWM QA Lead (Onsite)",client:"HomeGoods",priority:"Critical",loc:"USA",skills:["mawm","qa"]},
+  {title:"Sr. MAWM QA",client:"HomeGoods",priority:"High",loc:"India",skills:["mawm","qa"]},
+  {title:"Power BI Developer",client:"RetailCorp",priority:"High",loc:"India",skills:["power bi","bi","sql"]},
+  {title:"Data Architect - Retail",client:"RetailCorp",priority:"High",loc:"USA",skills:["snowflake","data","sql","python"]},
+  {title:"Senior AI Integration Dev",client:"RetailCorp",priority:"High",loc:"USA",skills:["python","java","api"]},
+  {title:"QA Engineer – AI Systems",client:"RetailCorp",priority:"High",loc:"USA",skills:["qa","automation","selenium"]},
+  {title:"Senior Data Engineer",client:"RetailCorp",priority:"High",loc:"USA",skills:["python","sql","etl","data"]},
+  {title:"Data Engineer (Azure)",client:"HealthNet",priority:"Critical",loc:"USA",skills:["azure","data","cloud","sql"]},
+  {title:"Azure DevOps Engineer",client:"FashionBrand",priority:"High",loc:"India",skills:["azure","devops","kubernetes"]},
+  {title:"Java Developer",client:"FashionBrand",priority:"High",loc:"USA",skills:["java"]},
+  {title:"HCL Commerce Developer",client:"FashionBrand",priority:"High",loc:"USA",skills:["java","ecommerce"]},
+  {title:"Automation QA (3 roles)",client:"MediaCo",priority:"High",loc:"India",skills:["qa","automation","selenium","java"]},
+  {title:"Ansible Consultant",client:"GlobalInsure",priority:"High",loc:"India",skills:["devops","ansible","cloud"]},
+  {title:"Sr. Java Developer",client:"HomeDecor",priority:"High",loc:"India",skills:["java","spring boot"]},
+  {title:"Informatica CDI Specialist",client:"DataConsulting",priority:"High",loc:"India",skills:["informatica","iics","data"]},
+  {title:"Sterling OMS Developer",client:"SportsCo",priority:"High",loc:"India",skills:["sterling oms","oms","java"]},
+  {title:"WMS Config Consultant",client:"WMSClient",priority:"High",loc:"USA",skills:["wms","mawm"]},
+  {title:"Salesforce CPQ Consultant",client:"FashionRetail",priority:"Medium",loc:"India",skills:["salesforce","cpq"]},
+  {title:"SRE Engineer",client:"GlobalInsure",priority:"Critical",loc:"India",skills:["sre","aws","kubernetes","devops"]},
+];
+
+const ROLLOFFS = [
+  {name:"Chandra, Vikram",client:"GlobalInsure",endDate:"2026-06-30",skills:"SRE DevOps OpenShift"},
+  {name:"Naidu, Ramesh",client:"DataFlow",endDate:"2026-06-19",skills:"Informatica PowerCenter IICS"},
+  {name:"Venkat, Suresh",client:"StyleCo",endDate:"2026-06-27",skills:"DataStage Unix SQL"},
+  {name:"Hussain, Farid",client:"BuildCorp",endDate:"2026-06-30",skills:"Mule ESB Azure Storage"},
+  {name:"Reddy, Kiran",client:"BuildCorp",endDate:"2026-06-30",skills:"Tableau Power BI MSBI"},
+  {name:"Iyer, Rajan",client:"FashionBrand",endDate:"2026-06-26",skills:"QA OMS WMS PKMS"},
+  {name:"Nair, Priya (A)",client:"FashionBrand",endDate:"2026-06-26",skills:"QA Automation Selenium"},
+  {name:"Lakshmi, Sandhya",client:"FashionBrand",endDate:"2026-10-30",skills:"QA PeopleSoft POS Postman"},
+  {name:"Menon, Suresh",client:"FashionBrand",endDate:"2026-07-31",skills:"QA OMS DOM eCommerce"},
+  {name:"Patel, Gaurav",client:"FashionBrand",endDate:"2026-07-31",skills:"POS QA Lead"},
+  {name:"Krishnan, Roopa",client:"FashionBrand",endDate:"2026-07-31",skills:"QA OMS Selenium Playwright"},
+  {name:"Rao, Vidya",client:"FashionBrand",endDate:"2026-07-31",skills:"QA POS OMS Playwright"},
+  {name:"Rajan, Mohan",client:"FashionBrand",endDate:"2026-07-31",skills:"QA eCommerce PIM"},
+  {name:"Kumar, Barath",client:"FashionBrand",endDate:"2026-08-28",skills:"QA RMS PIM WMS ETL PySpark"},
+  {name:"Singh, Uday",client:"FashionBrand",endDate:"2026-08-28",skills:"RMS OMS WMS Automation"},
+  {name:"Nair, Sandhya",client:"FashionBrand",endDate:"2026-10-02",skills:"QA B2B Oracle MFCS"},
+  {name:"Pillai, Divya",client:"FashionBrand",endDate:"2026-10-02",skills:"QA OMS SQL Sterling"},
+  {name:"Krishnaswamy, Madhavi",client:"FashionBrand",endDate:"2026-10-02",skills:"Oracle RMS OMS Pricing MFCS"},
+  {name:"Patil, Venkata",client:"FashionBrand",endDate:"2026-10-30",skills:"Selenium Playwright BDD Cypress"},
+  {name:"Ravi, Ashok",client:"FashionBrand",endDate:"2026-10-30",skills:"QA OMS API POS"},
+];
+
+// ─── CHARTS ─────────────────────────────────────────────────────────
+const COLORS = ['#0f766e','#2563eb','#7c3aed','#db2777','#d97706','#059669','#0891b2','#9333ea','#dc2626','#64748b'];
+
+function barChart(svgId, items, colors){
+  const svg = document.getElementById(svgId);
+  if(!svg) return;
+  const W=480,H=160,pad=30,barW=Math.min(40,Math.floor((W-pad*2)/items.length)-6);
+  const max=Math.max(...items.map(i=>i[1]),1);
+  let html='';
+  items.forEach(([label,val],i)=>{
+    const x=pad+i*(barW+Math.floor((W-pad*2-barW*items.length)/(items.length)));
+    const bh=Math.max(2,Math.round((val/max)*(H-38)));
+    const y=H-bh-20;
+    const col=colors?colors[i%colors.length]:COLORS[i%COLORS.length];
+    const short=label.length>9?label.slice(0,8)+'…':label;
+    html+=`<rect x="${x}" y="${y}" width="${barW}" height="${bh}" rx="4" fill="${col}" opacity=".85"/>
+      <text x="${x+barW/2}" y="${H-4}" text-anchor="middle" font-size="9" fill="#64748b" font-family="Inter">${short}</text>
+      <text x="${x+barW/2}" y="${y-5}" text-anchor="middle" font-size="10" font-weight="700" fill="${col}" font-family="Inter">${val}</text>`;
+  });
+  svg.innerHTML=html;
+}
+
+function donutChart(){
+  const clientMap={};
+  EMPLOYEES.filter(e=>e.status!=='resigned'&&e.client!=='Bench').forEach(e=>clientMap[e.client]=(clientMap[e.client]||0)+1);
+  const items=Object.entries(clientMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const total=items.reduce((s,[,v])=>s+v,0);
+  const svg=document.getElementById('donut-svg');
+  const leg=document.getElementById('donut-legend');
+  const r=55,cx=80,cy=80,sw=22,circ=2*Math.PI*r;
+  let offset=0,arcs='';
+  items.forEach(([label,val],i)=>{
+    const pct=val/total,dash=pct*circ;
+    arcs+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${COLORS[i%COLORS.length]}" stroke-width="${sw}" stroke-dasharray="${dash.toFixed(1)} ${(circ-dash).toFixed(1)}" stroke-dashoffset="${(-offset*circ).toFixed(1)}" transform="rotate(-90 ${cx} ${cy})" opacity=".88"/>`;
+    offset+=pct;
+  });
+  svg.innerHTML=arcs+`<text x="${cx}" y="${cy-5}" text-anchor="middle" font-size="20" font-weight="800" fill="#0f172a" font-family="Inter">${total}</text><text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="10" fill="#64748b" font-family="Inter">billed</text>`;
+  leg.innerHTML=items.map(([l,v],i)=>`<div class="legend-item"><div class="legend-dot" style="background:${COLORS[i%COLORS.length]}"></div>${l} <strong style="margin-left:auto;padding-left:8px">${v}</strong></div>`).join('');
+}
+
+// ─── VIEWS ───────────────────────────────────────────────────────────
+function show(id, btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('v-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(id==='bench') renderBench('');
+  if(id==='profiles') renderProfiles('');
+  if(id==='attrition') renderAttrition();
+  if(id==='rolloffs') renderRolloffs();
+}
+
+// ─── BENCH ───────────────────────────────────────────────────────────
+function matchScore(bench, pos){
+  const bs=bench.skills.toLowerCase();
+  const hits=pos.skills.filter(s=>bs.includes(s.toLowerCase())).length;
+  return Math.min(100,Math.round((hits/pos.skills.length)*100));
+}
+
+function renderBench(filter){
+  const f=filter.toLowerCase();
+  const items=BENCH.filter(b=>!f||b.name.toLowerCase().includes(f)||b.skills.toLowerCase().includes(f));
+  const container=document.getElementById('bench-list');
+  if(!items.length){container.innerHTML='<div style="color:var(--muted);padding:20px">No matches.</div>';return;}
+  container.innerHTML=items.sort((a,b)=>b.aging-a.aging).map(b=>{
+    const agingCol=b.aging>=180?'#dc2626':b.aging>=90?'#d97706':'#0f766e';
+    const agingBg=b.aging>=180?'#fef2f2':b.aging>=90?'#fffbeb':'#f0fdfa';
+    const matches=OPEN_POS.map(p=>({...p,score:matchScore(b,p)})).filter(p=>p.score>0).sort((a,b)=>b.score-a.score).slice(0,4);
+    const matchHTML=matches.length?matches.map(m=>{
+      const mc=m.score>=70?'#059669':m.score>=40?'#d97706':'#dc2626';
+      return `<span class="match-pill"><span class="match-score" style="background:${mc}">${m.score}%</span>${m.title.slice(0,22)}</span>`;
+    }).join(''):'<span style="font-size:11px;color:var(--muted);font-style:italic">No open position matches</span>';
+    return `<div class="bench-card">
+      <span class="bench-aging" style="background:${agingBg};color:${agingCol}">${b.aging}d</span>
+      <div style="flex:1">
+        <div class="bench-name">${b.name}</div>
+        <div class="bench-meta">${b.role} · ${b.client==='Bench'?'On bench':b.client}</div>
+        <div class="bench-skills">${b.skills.split(' ').slice(0,8).join(' · ')}</div>
+        <div style="margin-top:8px">${matchHTML}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterBench(v){renderBench(v);}
+
+function coverageCheck(name){
+  const res=document.getElementById('coverage-results');
+  if(!name||name.length<2){res.innerHTML='';return;}
+  const target=EMPLOYEES.find(e=>e.name.toLowerCase().includes(name.toLowerCase()));
+  if(!target){res.innerHTML='<div style="font-size:12px;color:var(--muted);margin-top:8px">Not found</div>';return;}
+  const ts=target.skills.toLowerCase().split(' ');
+  const candidates=BENCH.filter(b=>b.name!==target.name).map(b=>{
+    const bs=b.skills.toLowerCase();
+    const hits=ts.filter(s=>s.length>3&&bs.includes(s)).length;
+    const pct=Math.min(100,Math.round((hits/ts.length)*100));
+    return {...b,coverPct:pct};
+  }).filter(c=>c.coverPct>0).sort((a,b)=>b.coverPct-a.coverPct).slice(0,5);
+  res.innerHTML=`<div style="font-size:11px;color:var(--muted);margin-bottom:8px">Coverage for <strong>${target.name}</strong>:</div>`+
+    (candidates.length?candidates.map(c=>{
+      const col=c.coverPct>=60?'#059669':c.coverPct>=30?'#d97706':'#dc2626';
+      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+        <span style="font-weight:700;color:${col};width:36px">${c.coverPct}%</span>
+        <span>${c.name}</span>
+      </div>`;
+    }).join(''):'<div style="font-size:12px;color:var(--muted)">No bench coverage found</div>');
+}
+
+// ─── PROFILES ─────────────────────────────────────────────────────────
+const STATUS_LABEL={billed:'On Client',bench:'On Bench',pip:'PIP',resigned:'Resigned'};
+const STATUS_BADGE={billed:'badge-teal',bench:'badge-amber',pip:'badge-red',resigned:'badge-purple'};
+
+function renderProfiles(filter){
+  const f=filter.toLowerCase();
+  const items=EMPLOYEES.filter(e=>!f||e.name.toLowerCase().includes(f)||e.role.toLowerCase().includes(f)||e.client.toLowerCase().includes(f));
+  document.getElementById('profile-grid').innerHTML=items.map(e=>{
+    const initials=e.name.split(',').map(p=>p.trim()[0]).reverse().join('');
+    const ratingPct=(e.rating/5*100).toFixed(0);
+    return `<div class="profile-card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div class="profile-avatar" style="background:${e.color}">${initials}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:var(--ink)">${e.name}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.role}</div>
+        </div>
+        <span class="badge ${STATUS_BADGE[e.status]}">${STATUS_LABEL[e.status]}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:10px">
+        <span>📁 ${e.client}</span>
+        <span>🏷 ${e.dept}</span>
+      </div>
+      <div style="font-size:11px;color:var(--ink2);margin-bottom:10px">${e.skills.split(' ').slice(0,5).join(' · ')}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="flex:1">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px">Rating: ${e.rating}/5</div>
+          <div class="rating-bar"><div class="rating-fill" style="width:${ratingPct}%"></div></div>
+        </div>
+        <div style="margin-left:12px;font-size:11px;color:var(--green);font-weight:700">+${e.raise}% raise</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterProfiles(v){renderProfiles(v);}
+
+// ─── ATTRITION ─────────────────────────────────────────────────────────
+function renderAttrition(){
+  // By client
+  const clientMap={};
+  RESIGNED.forEach(e=>{clientMap[e.client]=(clientMap[e.client]||0)+1;});
+  const clientItems=Object.entries(clientMap).sort((a,b)=>b[1]-a[1]);
+  barChart('attr-chart',clientItems,['#dc2626','#ef4444','#f87171','#fca5a5','#fecaca','#fee2e2']);
+
+  // By dept/skill
+  const deptMap={};
+  RESIGNED.forEach(e=>{deptMap[e.dept]=(deptMap[e.dept]||0)+1;});
+  const deptItems=Object.entries(deptMap).sort((a,b)=>b[1]-a[1]);
+  barChart('skill-loss-chart',deptItems,['#7c3aed','#8b5cf6','#a78bfa','#c4b5fd','#ddd6fe']);
+
+  // List
+  document.getElementById('attr-list').innerHTML=RESIGNED.sort((a,b)=>new Date(a.lwd||'9999')-new Date(b.lwd||'9999')).map(e=>`
+    <div class="attr-row">
+      <div class="attr-name">${e.name}</div>
+      <div class="attr-skill">${e.role} · ${e.client}</div>
+      <div class="attr-lwd" style="color:${e.lwd==='TBD'?'#d97706':'#dc2626'}">LWD ${e.lwd||'TBD'}</div>
+    </div>`).join('');
+}
+
+// ─── ROLLOFFS ─────────────────────────────────────────────────────────
+function renderRolloffs(){
+  const today=new Date();
+  document.getElementById('rolloff-grid').innerHTML=ROLLOFFS.sort((a,b)=>new Date(a.endDate)-new Date(b.endDate)).map(r=>{
+    const d=Math.round((new Date(r.endDate)-today)/(1000*60*60*24));
+    const col=d<=30?'#dc2626':d<=60?'#d97706':'#0f766e';
+    return `<div class="rolloff-card" style="border-left-color:${col}">
+      <div class="rolloff-name">${r.name}</div>
+      <div class="rolloff-meta">${r.client} · ${r.skills.slice(0,40)}</div>
+      <div class="rolloff-days" style="color:${col}">${d > 0 ? d+'d away' : 'Today'} · ${r.endDate}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────
+window.onload=()=>{
+  // Practice area chart
+  const pMap={};
+  EMPLOYEES.filter(e=>e.status!=='resigned').forEach(e=>{pMap[e.dept]=(pMap[e.dept]||0)+1;});
+  const pItems=Object.entries(pMap).sort((a,b)=>b[1]-a[1]);
+  barChart('practice-bars',pItems);
+
+  // Donut
+  donutChart();
+
+  // Rating distribution
+  const rBands={'5.0':0,'4.0-4.9':0,'3.0-3.9':0,'<3.0':0};
+  EMPLOYEES.forEach(e=>{
+    if(e.rating>=5)rBands['5.0']++;
+    else if(e.rating>=4)rBands['4.0-4.9']++;
+    else if(e.rating>=3)rBands['3.0-3.9']++;
+    else rBands['<3.0']++;
+  });
+  barChart('rating-chart',Object.entries(rBands),['#059669','#0f766e','#d97706','#dc2626']);
+
+  // Bench aging
+  const aBands={'180+ days':0,'90-179d':0,'30-89d':0,'<30d':0,'Starting':0};
+  BENCH.forEach(b=>{
+    if(b.aging>=180)aBands['180+ days']++;
+    else if(b.aging>=90)aBands['90-179d']++;
+    else if(b.aging>=30)aBands['30-89d']++;
+    else if(b.aging>0)aBands['<30d']++;
+    else aBands['Starting']++;
+  });
+  barChart('aging-chart',Object.entries(aBands),['#dc2626','#d97706','#0f766e','#14b8a6','#94a3b8']);
+};
+</script>
 </body>
 </html>
