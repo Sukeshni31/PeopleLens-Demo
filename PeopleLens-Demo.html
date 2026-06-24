@@ -1454,14 +1454,10 @@ const DEMO_STATE = {"employees": {"Sharma, Priya": {"records": [{"label": "Appra
 
 window.onload = () => {
   try {
-    const s = localStorage.getItem('pl_data');
-    if(s && s.length > 50) {
-      state = JSON.parse(s);
-    } else {
-      // Load demo data on first visit
-      state = JSON.parse(JSON.stringify(DEMO_STATE));
-      localStorage.setItem('pl_data', JSON.stringify(state));
-    }
+    // Always load fresh demo data — clear any stale localStorage
+    localStorage.removeItem('pl_data');
+    state = JSON.parse(JSON.stringify(DEMO_STATE));
+    localStorage.setItem('pl_data', JSON.stringify(state));
     refreshSelect();
     const savedKey = localStorage.getItem('pl_gpt_key');
     if(savedKey) { gptKey = savedKey; updateApiStatus(); }
