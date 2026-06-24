@@ -1,8 +1,8 @@
 # PeopleLens — HR Intelligence Platform
 
-A browser-based HR intelligence platform built for IT services and GCC environments. Runs entirely in the browser — no backend, no database, no installation. Data loads from Excel files parsed at runtime.
+A browser-based HR intelligence platform built for IT services and GCC environments. Runs entirely in the browser — no backend, no database, no installation.
 
-🔗 **Demo:** Deploy `PeopleLens-Demo.html` directly to any static host (Vercel, Netlify, GitHub Pages)
+🔗 **Live Demo:** [sukeshni31.github.io/PeopleLens-Demo](https://sukeshni31.github.io/PeopleLens-Demo/)
 
 ---
 
@@ -30,7 +30,6 @@ PeopleLens gives HR leaders and account managers a single-pane view of their wor
 
 **Practice Area View**
 - Workforce segmented by practice (QA, Dev, Integration, Data, Cloud, BI, etc.)
-- Headcount and bench count per practice
 - Build/Buy/Borrow/Bot analysis integration
 
 ---
@@ -38,19 +37,15 @@ PeopleLens gives HR leaders and account managers a single-pane view of their wor
 ## How it works
 
 - Single HTML file — all logic, CSS, and UI in one place
-- Data is loaded from localStorage (paste from Excel or import JSON)
+- Data loaded via localStorage (paste from Excel or import JSON)
 - Claude API powers the AI Intelligence Brief feature
-- No login, no server, no dependencies to install
+- No login, no server, no dependencies
 
 ---
 
 ## Built for
 
-GCC and IT services HR teams managing:
-- Bench utilisation and billability risk
-- Skill-to-requirement matching across accounts
-- Workforce visibility for account managers and leadership
-- Performance and appraisal data in one view
+GCC and IT services HR teams managing bench utilisation, skill-to-requirement matching, workforce visibility, and appraisal data in one view.
 
 ---
 
@@ -60,6 +55,4 @@ GCC and IT services HR teams managing:
 
 ---
 
-## Note
-
-This is a demo version with anonymised sample data. Built as part of an HR AI tools portfolio — see [github.com/Sukeshni31](https://github.com/Sukeshni31) for the full suite.
+> Demo version with anonymised sample data. Part of an HR AI tools portfolio — [github.com/Sukeshni31](https://github.com/Sukeshni31)
